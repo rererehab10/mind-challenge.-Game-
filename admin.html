@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0d0b14" />
+    <meta name="description" content="Mindspace Admin Dashboard — Back Office for Client & User Management." />
+    <title>Mindspace Back Office — Administrator Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="admin.css" />
+    <script src="admin.js" defer></script>
+  </head>
+  <body class="admin-body">
+    <!-- Unauthenticated / Login Guard -->
+    <div id="admin-auth-guard" class="admin-guard-screen" hidden>
+      <div class="guard-card">
+        <div class="guard-badge">
+          <span class="guard-shield">✦</span>
+          <span>RESTRICTED ACCESS</span>
+        </div>
+        <div class="guard-brand">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          <span class="brand-name">Mind<span>space</span> <small class="admin-tag">ADMIN</small></span>
+        </div>
+        <h1 class="guard-title">Administrator Portal</h1>
+        <p class="guard-subtitle">Private management space. Please sign in with administrator credentials to manage clients and platform data.</p>
+        
+        <form id="guard-login-form" class="guard-form" novalidate>
+          <div class="form-field">
+            <label for="guard-email">ADMIN EMAIL</label>
+            <input id="guard-email" type="email" placeholder="admin@mindchallenge.demo" required />
+          </div>
+          <div class="form-field">
+            <label for="guard-password">PASSWORD</label>
+            <input id="guard-password" type="password" placeholder="••••••••••••" required />
+          </div>
+          <button class="button-primary guard-submit" type="submit">Access Back Office →</button>
+          <p id="guard-error" class="admin-form-message error" role="alert"></p>
+        </form>
+
+        <div class="guard-demo-box">
+          <div class="demo-box-head">
+            <span>🔑 DEMO CREDENTIALS</span>
+            <button id="guard-autofill" class="text-button" type="button">Autofill credentials</button>
+          </div>
+          <p class="demo-creds">
+            Email: <code>admin@mindchallenge.demo</code><br />
+            Password: <code>MindChallengeAdmin2026!</code>
+          </p>
+        </div>
+
+        <div class="guard-footer">
+          <a href="index.html" class="guard-return-link">← Return to Client Space</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Authenticated Admin Space -->
+    <div id="admin-app-shell" class="admin-app-shell" hidden>
+      <!-- Admin Topbar -->
+      <header class="admin-topbar">
+        <div class="admin-topbar-left">
+          <a class="brand admin-brand" href="admin.html" aria-label="Mindspace Admin">
+            <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+            <span class="brand-name">Mind<span>space</span> <span class="admin-pill">BACK OFFICE</span></span>
+          </a>
+          <span class="topbar-divider"></span>
+          <div class="admin-breadcrumbs">
+            <span>ADMINISTRATION</span>
+            <span class="breadcrumb-slash">/</span>
+            <strong id="admin-breadcrumb-section">Clients Directory</strong>
+          </div>
+        </div>
+
+        <div class="admin-topbar-right">
+          <a href="index.html" class="client-portal-button" title="View the public player interface" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true" width="15" height="15"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span>Client Game Space</span>
+          </a>
+          <button class="theme-toggle" id="admin-theme-toggle" aria-label="Switch theme">
+            <svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
+            <span class="toggle-track"><span></span></span>
+          </button>
+          <div class="admin-user-menu">
+            <span class="admin-avatar">A</span>
+            <div class="admin-user-info">
+              <strong id="admin-user-name">Administrator</strong>
+              <small id="admin-user-email">admin@mindchallenge.demo</small>
+            </div>
+            <button id="admin-logout-btn" class="button-secondary admin-logout-btn" title="Sign out of Admin Dashboard">
+              Sign out
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Layout -->
+      <div class="admin-layout">
+        <!-- Sub-navigation Tabs -->
+        <nav class="admin-nav-bar" aria-label="Back office sections">
+          <div class="admin-nav-tabs">
+            <button class="admin-nav-tab active" data-tab="directory">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>Clients Directory</span>
+              <span class="tab-badge" id="client-count-badge">0</span>
+            </button>
+            <button class="admin-nav-tab" data-tab="add">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              <span>Add Client</span>
+            </button>
+            <button class="admin-nav-tab" data-tab="edit">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              <span>Edit Info</span>
+            </button>
+            <button class="admin-nav-tab" data-tab="update">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              <span>Update Data & Progress</span>
+            </button>
+            <button class="admin-nav-tab" data-tab="delete">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+              <span>Delete Account</span>
+            </button>
+            <button class="admin-nav-tab highlight-tab" data-tab="casestudy">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              <span>Client Usage Story</span>
+              <span class="story-tag">EXAMPLE</span>
+            </button>
+          </div>
+        </nav>
+
+        <!-- KPI Summary Cards -->
+        <section class="admin-kpi-grid" aria-label="Platform Metrics">
+          <div class="kpi-card">
+            <div class="kpi-icon kpi-purple">👥</div>
+            <div class="kpi-copy">
+              <span class="kpi-label">REGISTERED CLIENTS</span>
+              <strong class="kpi-val" id="kpi-total-clients">0</strong>
+              <span class="kpi-sub">Total client accounts</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon kpi-green">✓</div>
+            <div class="kpi-copy">
+              <span class="kpi-label">PUZZLES SOLVED</span>
+              <strong class="kpi-val" id="kpi-total-solved">0</strong>
+              <span class="kpi-sub">Across all registered users</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon kpi-gold">⚡</div>
+            <div class="kpi-copy">
+              <span class="kpi-label">TOTAL POINTS EARNED</span>
+              <strong class="kpi-val" id="kpi-total-points">0</strong>
+              <span class="kpi-sub">Accumulated logic score</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon kpi-pink">★</div>
+            <div class="kpi-copy">
+              <span class="kpi-label">TOP PERFORMER</span>
+              <strong class="kpi-val kpi-val-text" id="kpi-top-client">—</strong>
+              <span class="kpi-sub" id="kpi-top-stats">0 pts · 0 completed</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab Contents -->
+        <main class="admin-main-view">
+          <!-- 1. DIRECTORY (Affichage) -->
+          <section id="tab-directory" class="admin-tab-pane active">
+            <div class="pane-card">
+              <div class="pane-card-header">
+                <div>
+                  <h2 class="pane-title">Clients Directory <span class="pane-subtitle-tag">(Affichage)</span></h2>
+                  <p class="pane-description">All registered client accounts, their scores, puzzle progress, and activity timestamps.</p>
+                </div>
+                <button class="button-primary" id="btn-quick-add-client">＋ Add new client</button>
+              </div>
+
+              <!-- Search & Filter Toolbar -->
+              <div class="admin-toolbar">
+                <div class="admin-search-box">
+                  <span aria-hidden="true">⌕</span>
+                  <input type="search" id="directory-search" placeholder="Search by client name, email, or user ID…" />
+                </div>
+                <div class="admin-filter-group">
+                  <label for="filter-status">Filter by:</label>
+                  <select id="filter-status">
+                    <option value="all">All registered accounts</option>
+                    <option value="active">Active players (Score > 0)</option>
+                    <option value="masters">Master solvers (6+ solved)</option>
+                  </select>
+                </div>
+                <button id="btn-directory-refresh" class="button-secondary">↻ Refresh list</button>
+              </div>
+
+              <!-- Client Table -->
+              <div class="admin-table-wrap">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>CLIENT</th>
+                      <th>EMAIL</th>
+                      <th>SOLVED PUZZLES</th>
+                      <th>TOTAL SCORE</th>
+                      <th>STREAK</th>
+                      <th>JOINED</th>
+                      <th>LAST ACTIVE</th>
+                      <th style="text-align: right">ACTIONS</th>
+                    </tr>
+                  </thead>
+                  <tbody id="directory-table-body">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- 2. ADD USER (Ajouter) -->
+          <section id="tab-add" class="admin-tab-pane">
+            <div class="pane-card">
+              <div class="pane-card-header">
+                <div>
+                  <h2 class="pane-title">Add New Client <span class="pane-subtitle-tag">(Ajouter)</span></h2>
+                  <p class="pane-description">Register a new client in Mindspace with custom starting puzzle progress or points.</p>
+                </div>
+              </div>
+
+              <form id="add-client-form" class="admin-form" novalidate>
+                <div class="admin-form-grid">
+                  <div class="form-field">
+                    <label for="new-client-name">FULL NAME *</label>
+                    <input id="new-client-name" name="name" type="text" placeholder="e.g. Thomas Laurent" required maxlength="32" />
+                  </div>
+                  <div class="form-field">
+                    <label for="new-client-email">EMAIL ADDRESS *</label>
+                    <input id="new-client-email" name="email" type="email" placeholder="thomas@example.com" required />
+                  </div>
+                  <div class="form-field">
+                    <label for="new-client-password">INITIAL PASSWORD *</label>
+                    <input id="new-client-password" name="password" type="password" placeholder="At least 8 characters" minlength="8" required />
+                  </div>
+                  <div class="form-field">
+                    <label for="new-client-score">INITIAL SCORE (POINTS)</label>
+                    <input id="new-client-score" name="score" type="number" min="0" max="5000" value="0" />
+                  </div>
+                </div>
+
+                <div class="form-field">
+                  <label>INITIAL UNLOCKED / COMPLETED CHALLENGES</label>
+                  <div class="puzzle-selection-grid" id="new-client-puzzles">
+                    <!-- Checkboxes injected by JS -->
+                  </div>
+                </div>
+
+                <div class="form-field">
+                  <label for="new-client-notes">ADMINISTRATOR NOTES (OPTIONAL)</label>
+                  <textarea id="new-client-notes" name="notes" rows="3" placeholder="e.g. Onboarded for company logic assessment, active mobile client."></textarea>
+                </div>
+
+                <div class="form-actions-row">
+                  <button type="submit" class="button-primary">Create Client Account →</button>
+                  <p id="add-client-feedback" class="admin-form-message" role="status"></p>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <!-- 3. EDIT USER (Modifier) -->
+          <section id="tab-edit" class="admin-tab-pane">
+            <div class="pane-card">
+              <div class="pane-card-header">
+                <div>
+                  <h2 class="pane-title">Edit Client Information <span class="pane-subtitle-tag">(Modifier)</span></h2>
+                  <p class="pane-description">Update client personal details, contact email, and administrative notes.</p>
+                </div>
+              </div>
+
+              <div class="client-selector-bar">
+                <label for="edit-client-select">SELECT CLIENT TO EDIT:</label>
+                <select id="edit-client-select">
+                  <!-- Populated by JS -->
+                </select>
+              </div>
+
+              <form id="edit-client-form" class="admin-form" novalidate>
+                <div class="client-quick-card" id="edit-client-preview">
+                  <!-- Injected preview -->
+                </div>
+
+                <div class="admin-form-grid">
+                  <div class="form-field">
+                    <label for="edit-client-name">DISPLAY NAME *</label>
+                    <input id="edit-client-name" name="name" type="text" required maxlength="32" />
+                  </div>
+                  <div class="form-field">
+                    <label for="edit-client-email">EMAIL ADDRESS *</label>
+                    <input id="edit-client-email" name="email" type="email" required />
+                  </div>
+                </div>
+
+                <div class="form-field">
+                  <label for="edit-client-notes">INTERNAL CLIENT NOTES</label>
+                  <textarea id="edit-client-notes" name="notes" rows="3" placeholder="Notes about this client's usage, preferences, or account history..."></textarea>
+                </div>
+
+                <div class="form-actions-row">
+                  <button type="submit" class="button-primary">Save Client Details →</button>
+                  <p id="edit-client-feedback" class="admin-form-message" role="status"></p>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <!-- 4. UPDATE DATA & PROGRESS (Mise à jour) -->
+          <section id="tab-update" class="admin-tab-pane">
+            <div class="pane-card">
+              <div class="pane-card-header">
+                <div>
+                  <h2 class="pane-title">Update User Data & Progress <span class="pane-subtitle-tag">(Mise à jour)</span></h2>
+                  <p class="pane-description">Directly adjust client score, daily streak, completed levels, and security credentials.</p>
+                </div>
+              </div>
+
+              <div class="client-selector-bar">
+                <label for="update-client-select">SELECT CLIENT:</label>
+                <select id="update-client-select">
+                  <!-- Populated by JS -->
+                </select>
+              </div>
+
+              <form id="update-data-form" class="admin-form" novalidate>
+                <div class="admin-form-grid">
+                  <div class="form-field">
+                    <label for="update-score">TOTAL SCORE (POINTS)</label>
+                    <div class="number-input-group">
+                      <button type="button" class="btn-step" data-step="-50">-50</button>
+                      <input id="update-score" type="number" min="0" max="10000" />
+                      <button type="button" class="btn-step" data-step="+50">+50</button>
+                      <button type="button" class="btn-step" data-step="+100">+100</button>
+                    </div>
+                  </div>
+                  <div class="form-field">
+                    <label for="update-streak">DAY STREAK</label>
+                    <div class="number-input-group">
+                      <button type="button" class="btn-step-streak" data-step="-1">-1</button>
+                      <input id="update-streak" type="number" min="0" max="365" />
+                      <button type="button" class="btn-step-streak" data-step="+1">+1</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-field">
+                  <label>COMPLETED PUZZLES / LEVELS</label>
+                  <p class="field-subtext">Toggle completed puzzles for this user. Points can be auto-calculated or customized above.</p>
+                  <div class="puzzle-selection-grid" id="update-puzzles-grid">
+                    <!-- Injected by JS -->
+                  </div>
+                </div>
+
+                <div class="form-field password-reset-box">
+                  <label for="update-new-password">RESET CLIENT PASSWORD (OPTIONAL)</label>
+                  <input id="update-new-password" type="password" placeholder="Leave empty to keep current password" minlength="8" />
+                  <small>If set, changes the user's local login password.</small>
+                </div>
+
+                <div class="form-actions-row">
+                  <button type="submit" class="button-primary">Apply Data Updates →</button>
+                  <p id="update-data-feedback" class="admin-form-message" role="status"></p>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <!-- 5. DELETE USER (Supprimer) -->
+          <section id="tab-delete" class="admin-tab-pane">
+            <div class="pane-card pane-card-danger">
+              <div class="pane-card-header">
+                <div>
+                  <h2 class="pane-title text-danger">Delete Client Account <span class="pane-subtitle-tag">(Supprimer)</span></h2>
+                  <p class="pane-description">Permanently remove a client account and all related gameplay history from the browser storage.</p>
+                </div>
+              </div>
+
+              <div class="client-selector-bar">
+                <label for="delete-client-select">SELECT CLIENT TO REMOVE:</label>
+                <select id="delete-client-select">
+                  <!-- Populated by JS -->
+                </select>
+              </div>
+
+              <div class="delete-warning-box">
+                <div class="warning-icon">⚠</div>
+                <div>
+                  <strong>Irreversible Action</strong>
+                  <p>Deleting a client will delete their scores, unlocked puzzles, streak data, and account records. The demo administrator account is protected and cannot be deleted.</p>
+                </div>
+              </div>
+
+              <div class="delete-client-preview" id="delete-preview-card">
+                <!-- Injected preview -->
+              </div>
+
+              <div class="form-actions-row">
+                <button type="button" id="btn-trigger-delete" class="button-primary danger-button">Delete This Client Account</button>
+                <p id="delete-feedback" class="admin-form-message" role="status"></p>
+              </div>
+            </div>
+          </section>
+
+          <!-- 6. CLIENT USAGE CASE STUDY / EXAMPLE ("exempl about a client who used my web") -->
+          <section id="tab-casestudy" class="admin-tab-pane">
+            <div class="pane-card">
+              <div class="pane-card-header">
+                <div>
+                  <div class="eyebrow"><span class="eyebrow-dot"></span> REAL-WORLD USAGE SPOTLIGHT</div>
+                  <h2 class="pane-title">Client Case Study: Sarah's Journey on Mindspace</h2>
+                  <p class="pane-description">A documented example of how a client uses Mindspace for daily cognitive warm-up, tracks their progress, and engages with logic puzzles.</p>
+                </div>
+                <div class="client-story-badge">
+                  <span>✦ VERIFIED CLIENT CASE</span>
+                </div>
+              </div>
+
+              <!-- Case Study Hero -->
+              <div class="story-hero-card">
+                <div class="story-profile">
+                  <div class="story-avatar">SJ</div>
+                  <div class="story-profile-text">
+                    <h3>Sarah Jenkins</h3>
+                    <p>Product Designer & UX Researcher · Joined 14 days ago</p>
+                    <div class="story-tags">
+                      <span class="story-pill">Daily Active User</span>
+                      <span class="story-pill pill-gold">5-Day Streak ✦</span>
+                      <span class="story-pill pill-green">6 Solved Puzzles</span>
+                      <span class="story-pill pill-purple">1,180 Total Pts</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="story-quote">
+                  <div class="quote-mark">“</div>
+                  <p class="quote-text">I open Mindspace every morning around 8:45 AM before opening Slack. Solving one bite-sized riddle or number pattern gives my mind clarity and switches on my problem-solving brain without the stress of typical phone games.</p>
+                  <span class="quote-author">— Sarah Jenkins, UX Designer & Mindspace Client</span>
+                </div>
+              </div>
+
+              <!-- 3-Column Usage Breakdown -->
+              <div class="story-grid-3">
+                <div class="story-stat-box">
+                  <span class="box-label">DAILY USAGE ROUTINE</span>
+                  <strong>Morning Coffee Routine</strong>
+                  <p>Sarah typically spends 3 to 5 minutes on Mindspace each weekday morning. She keeps a consistent streak by tackling the next unlocked puzzle.</p>
+                  <div class="routine-steps">
+                    <span>1. Sign in & check streak</span>
+                    <span>2. Inspect next puzzle prompt</span>
+                    <span>3. Solve or request a hint</span>
+                    <span>4. Check ranking on leaderboard</span>
+                  </div>
+                </div>
+
+                <div class="story-stat-box">
+                  <span class="box-label">PERFORMANCE METRICS</span>
+                  <strong>High Deduction Accuracy</strong>
+                  <div class="metric-row">
+                    <span>Puzzles Completed:</span>
+                    <b>6 / 8 (75%)</b>
+                  </div>
+                  <div class="metric-row">
+                    <span>Hints Used:</span>
+                    <b>Only 1 hint (Clockwork)</b>
+                  </div>
+                  <div class="metric-row">
+                    <span>Favorite Category:</span>
+                    <b>Logic & Deduction</b>
+                  </div>
+                  <div class="metric-row">
+                    <span>Current Streak:</span>
+                    <b>5 consecutive days</b>
+                  </div>
+                </div>
+
+                <div class="story-stat-box">
+                  <span class="box-label">ADMINISTRATIVE VALUE</span>
+                  <strong>Client Engagement Insights</strong>
+                  <p>From an admin perspective, Sarah represents high-retention users: progression is gradual, streak mechanics drive daily logins, and scores reflect real puzzle mastery.</p>
+                  <button class="button-secondary story-action-btn" id="btn-inspect-sarah">
+                    Inspect Sarah's Record in Back Office →
+                  </button>
+                </div>
+              </div>
+
+              <!-- Detailed Puzzle-by-Puzzle Timeline for Sarah -->
+              <div class="story-timeline-section">
+                <h3 class="timeline-title">Puzzle Completion Activity Log</h3>
+                <div class="timeline-list">
+                  <div class="timeline-item done">
+                    <span class="tl-status">✓</span>
+                    <div class="tl-content">
+                      <strong>Challenge 1: What comes next? (Number Patterns)</strong>
+                      <span>Completed in 1m 20s · +100 points earned · Solved on first attempt</span>
+                    </div>
+                    <time class="tl-time">Day 1</time>
+                  </div>
+                  <div class="timeline-item done">
+                    <span class="tl-status">✓</span>
+                    <div class="tl-content">
+                      <strong>Challenge 2: The switched labels (Logic)</strong>
+                      <span>Completed in 2m 10s · +120 points earned · "Her favorite puzzle so far"</span>
+                    </div>
+                    <time class="tl-time">Day 2</time>
+                  </div>
+                  <div class="timeline-item done">
+                    <span class="tl-status">✓</span>
+                    <div class="tl-content">
+                      <strong>Challenge 3: A clever crossing (Riddle)</strong>
+                      <span>Completed in 1m 45s · +100 points earned · River crossing classic</span>
+                    </div>
+                    <time class="tl-time">Day 3</time>
+                  </div>
+                  <div class="timeline-item done">
+                    <span class="tl-status">✓</span>
+                    <div class="tl-content">
+                      <strong>Challenge 4: The missing square (Number Patterns)</strong>
+                      <span>Completed in 2m 30s · +150 points earned · Pattern spotted quickly</span>
+                    </div>
+                    <time class="tl-time">Day 4</time>
+                  </div>
+                  <div class="timeline-item done">
+                    <span class="tl-status">✓</span>
+                    <div class="tl-content">
+                      <strong>Challenge 5: Who said it? (Deduction)</strong>
+                      <span>Completed in 2m 55s · +160 points earned · Truth-teller deduction</span>
+                    </div>
+                    <time class="tl-time">Day 5</time>
+                  </div>
+                  <div class="timeline-item done">
+                    <span class="tl-status">✓</span>
+                    <div class="tl-content">
+                      <strong>Challenge 7: The silent sequence (Pattern Spotting)</strong>
+                      <span>Completed in 3m 40s · +200 points earned · Look-and-say sequence cracked</span>
+                    </div>
+                    <time class="tl-time">Day 5</time>
+                  </div>
+                  <div class="timeline-item pending">
+                    <span class="tl-status">◇</span>
+                    <div class="tl-content">
+                      <strong>Challenge 8: The last lantern (Logic - Hard)</strong>
+                      <span>Currently unlocked and waiting for Sarah's next morning session!</span>
+                    </div>
+                    <time class="tl-time">Up Next</time>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+
+      <!-- Footer -->
+      <footer class="admin-footer">
+        <span>MINDSPACE BACK OFFICE · PRIVATE ADMINISTRATOR SYSTEM</span>
+        <span>MIND CHALLENGE © 2026</span>
+      </footer>
+    </div>
+
+    <!-- Client Detail Modal / Drawer -->
+    <div class="modal-backdrop" id="client-detail-backdrop" hidden>
+      <section class="admin-modal" role="dialog" aria-modal="true" aria-labelledby="client-detail-name">
+        <button class="modal-close" id="btn-close-detail" aria-label="Close dialog">×</button>
+        <div id="client-detail-content">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-backdrop" id="admin-confirm-backdrop" hidden>
+      <section class="confirm-modal" role="alertdialog" aria-modal="true">
+        <div class="confirm-icon" aria-hidden="true">!</div>
+        <h2 id="admin-confirm-title">Are you sure?</h2>
+        <p id="admin-confirm-message"></p>
+        <div class="confirm-actions">
+          <button class="button-secondary" id="admin-confirm-cancel">Cancel</button>
+          <button class="button-primary danger-button" id="admin-confirm-accept">Confirm</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Toast -->
+    <div id="admin-toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
